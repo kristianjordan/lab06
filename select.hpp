@@ -26,7 +26,8 @@ protected:
 public:
     Select_Column(const Spreadsheet* sheet, const std::string& name)
     {
-        column = sheet->get_column_by_name(name);
+	if (sheet != nullptr)
+        	column = sheet->get_column_by_name(name);
     }
 
     virtual bool select(const Spreadsheet* sheet, int row) const
@@ -36,6 +37,59 @@ public:
 
     // Derived classes can instead implement this simpler interface.
     virtual bool select(const std::string& s) const = 0;
+};
+
+class Select_Composite : public Select_Column
+{
+protected:
+    std::vector<Select_Column*> selectPtr;
+
+public:
+    ~Select_Composite()
+    {
+        for (int i = 0; i < selectPtr.size(); i ++)
+        {
+            delete selectPtr[i];
+        }	
+    }
+    Select_Composite(Select_Column* p1, Select_Column* p2) : Select_Column(nullptr, "")
+    {
+        selectPtr.push_back(p1);
+        selectPtr.push_back(p2);
+    }
+    virtual bool select(const std::string& s) const
+    {
+        return true;
+    }
+
+    // virtual function that children must implement
+    virtual bool select(const Spreadsheet* sheet, int row) const = 0;
+};
+
+class Select_And : public Select_Composite
+{
+public:
+    Select_And(Select_Column* s1, Select_Column* s2) : Select_Composite(s1, s2){}
+    bool select(const Spreadsheet* sheet, int row) const
+    {
+        bool result = true;
+        for (Select_Column* select : selectPtr)
+            result = result && select->select(sheet,row);
+        return result;
+    }
+};
+
+class Select_Or : public Select_Composite
+{
+public:
+    Select_Or(Select_Column* s1, Select_Column* s2) : Select_Composite(s1, s2){}
+    bool select(const Spreadsheet* sheet, int row) const
+    {
+        bool result = false;
+        for (Select_Column* select : selectPtr)
+            result = result || select->select(sheet,row);
+        return result;
+    }
 };
 
 #endif //__SELECT_HPP__

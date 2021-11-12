@@ -10,8 +10,8 @@ class Select;
 
 class Spreadsheet
 {
-    std::vector<std::string> column_names;
-    std::vector<std::vector<std::string> > data;
+    std::vector<std::string> column_names; // vector to store names of columns
+    std::vector<std::vector<std::string> > data; // vector of vectors to hold data
     Select* select = nullptr;
 
 public:

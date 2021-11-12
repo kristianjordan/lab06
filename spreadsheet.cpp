@@ -40,3 +40,28 @@ int Spreadsheet::get_column_by_name(const std::string& name) const
             return i;
     return -1;
 }
+
+void Spreadsheet::print_selection(std::ostream& out) const
+{
+    if (select == nullptr)
+    {
+        for (int row=0; row < data.size(); row++)
+        {
+            for (int col=0; col < column_names.size(); col++)
+                out << data.at(row).at(col) << " ";
+            out << "\n";
+        }
+    }
+    else
+    {  // only print the selected rows that match the criteria
+        for (int row=0; row < data.size(); row++)
+        {
+            if (select->select(this,row))
+            {
+                for (int col=0; col < column_names.size(); col++)
+                    out << data.at(row).at(col) << " ";
+                out << "\n";
+            }
+        }
+    }
+}
