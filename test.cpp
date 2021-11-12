@@ -1,6 +1,6 @@
 #include "spreadsheet.hpp"
 #include "andOr_test.hpp"
-
+#include "ContainNot_test.hpp"
 #include "gtest/gtest.h"
 
 

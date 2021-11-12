@@ -92,4 +92,45 @@ public:
     }
 };
 
+class Select_Contains : public Select_Column
+{
+protected:
+    std::string isString;
+
+public:
+    Select_Contains(const Spreadsheet* sheet, const std::string& name, const std::string& doesContain) : Select_Column(sheet, name){
+        isString = doesContain;
+    }
+    //~Select_Contains() {}
+    
+    virtual bool select(const Spreadsheet* sheet, int row) const
+    {
+        if ( sheet->cell_data(row, column).find(isString) != std::string::npos) return true;
+        return false;
+    }
+    virtual bool select(const std::string& s) const { return true; }
+};
+
+
+class Select_Not : public Select
+{
+protected:
+    Select_Column* hasNot;
+
+public:
+    Select_Not(Select_Column* cpy) {
+        hasNot = cpy;
+    }
+    ~Select_Not() {
+	 delete hasNot;
+    }
+    virtual bool select(const Spreadsheet* sheet, int row) const
+    {
+        return !hasNot->select(sheet,row);
+    }
+    virtual bool select(const std::string& s) const { return !hasNot->select(s); }
+
+};
+
+
 #endif //__SELECT_HPP__
